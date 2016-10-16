@@ -7,6 +7,9 @@ use \Framework\Router;
  * Callback function retrieve $args as route params
  */
 
-Router::get('', function($args) {});
-Router::get('/1/{1}/{2}/3/{4}', function($args) {});
-Router::get('/2/{vote}/{asd2}/3/{zxc4}/2/{vbn5}', function($args) {render('app', ['data' => $args]);});
+#TODO numeric params
+Router::get('', function($args) {
+    dump($args);
+});
+Router::get('/1/{page1}/{xcv}/3/{4}', function($args) {dump($args);});
+Router::get('/2/{vote}/{asd2}/3/{zxc4}/2/{vbn5}', function($args) {dump($args);});

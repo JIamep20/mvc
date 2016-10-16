@@ -27,7 +27,6 @@ class Kernel
         $this->uri = trim(urldecode(preg_replace('/\?.*/iu', '', $_SERVER['REQUEST_URI'])), '/');
         $this->get_params = $_GET;
         unset($this->get_params['uri']);
-
         try {
             $this->getRequestType();
             $this->processRoutes();
@@ -85,6 +84,11 @@ class Kernel
                 preg_match_all('@{' . $this->param_reg_ex . '}@', $route['r'], $params_names);
 
                 $params_names = $params_names[1];
+                array_map(function($item) use ($route){
+                    if(preg_match('/^\d/', $item) === 1) {
+                        throw new Exception('Route parameter can not start with number: ' . $route['r'] , 500);
+                    }
+                }, $params_names);
 
                 $this->processController($route, array_combine($params_names, $args));
                 return;
@@ -109,11 +113,14 @@ class Kernel
             }, explode('.', $route['middleware']));
         }
 
+        $data = $this->make_object_from_array($args);
+        $data->gets = $this->make_object_from_array($this->get_params);
+
         if(is_callable($route['method'])) {
-            $route['method'](array_merge($args, $this->get_params));
+            $route['method']($data);
         } elseif (array_key_exists('controller', $route) && array_key_exists('method', $route)) {
             $className = '\\App\\Controllers\\' . $route['controller'];
-            new $className($route['method'], array_merge($args, $this->get_params));
+            new $className($route['method'], $data);
         } else {
             throw new Exception('No controllers or callbacks found for this route', 403);
         }
@@ -133,6 +140,16 @@ class Kernel
                 ($type === 'POST' ? (isset($_POST['_method']) ? $_POST['_method'] : 'POST') :
                     $type)
         );
+    }
+
+    /**
+     * @param $array
+     * @param bool $through_json
+     * @return mixed|object
+     */
+    private function make_object_from_array($array) {
+        #TODO ctype_digit
+        return (object)$array;
     }
 
 }
