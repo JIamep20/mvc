@@ -91,18 +91,19 @@ class Kernel
     }
 
     /**
-     * Method starts callback or Controller->method as described in routes.php
+     * Method starts middlewares, callback or Controller->method as described in routes.php
      * @param $route
      * @param array $args
      * @throws Exception
      */
     private function processController($route, $args = [])
     {
-        if(array_key_exists('middleware', $route))
+        if(array_key_exists('middleware', $route)){
             array_map(function($item){
                 $name = '\\App\\Middleware\\' . $item;
                 new $name;
             }, explode('.', $route['middleware']));
+        }
 
         if(is_callable($route['method'])) {
             $route['method']($args);
@@ -116,7 +117,7 @@ class Kernel
 
     /**
      * Method defines request type depending on $_SERVER['REQUEST_METHOD'] 
-     * and existance of hidden fields with method type if 
+     * and existance of hidden inputs with method type, if
      * sended from browser request needs custom 
      * type(update, put, patch, delete etc)
      */
