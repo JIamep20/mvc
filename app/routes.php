@@ -1,11 +1,10 @@
 <?php
 
-// Split middleware using '.'
-// Callbacks get $args in params
-// Use 'closure' => function($args) {render('....');};
+use \Framework\Router;
 
-return [
-    //example
-    ['r' => 'example', 'type' => 'get', 'middleware' => 'Middleware', 'controller' => 'Controller', 'method' => 'index', 'callback' => function($args) {render('app');}],
+/**
+ * Define here routes for your app
+ * Callback function retrieve $args as route params
+ */
 
-];
+Router::get('', function($args) {dump($args, true);});

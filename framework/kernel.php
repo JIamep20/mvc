@@ -13,7 +13,7 @@ class Kernel
     protected
         $uri,
         $routes = [],
-        $method = 'GET',
+        $type = 'GET',
         $param_reg_ex = '([A-z0-9_-]+)'
     ;
 
@@ -66,14 +66,15 @@ class Kernel
      */
     private function processRoutes()
     {
-        foreach (require(BASE_DIR . '/app/routes.php') as $route) {
+        require(BASE_DIR . '/app/routes.php');
+        foreach (Router::getRoutes() as $route) {
             $this->routes[] = $this->prepareRoute($route);
         }
 
         $args = [];
 
         foreach($this->routes as $route) {
-            if(preg_match($route['r'], $this->uri, $args) && $route['type'] === $this->method){
+            if(preg_match($route['r'], $this->uri, $args) && $route['type'] === $this->type){
                 array_shift($args);
                 $this->processController($route, $args);
                 return;
@@ -97,11 +98,11 @@ class Kernel
                 new $name;
             }, explode('.', $route['middleware']));
 
-        if(array_key_exists('callback', $route) && is_callable($route['callback'])) {
-            $route['callback']($args);
-        } elseif(array_key_exists('controller', $route) && array_key_exists('method', $route) && class_exists('\\App\\Controllers\\' . $route['controller'])) {
+        if(is_callable($route['method'])) {
+            $route['method']($args);
+        } elseif (array_key_exists('controller', $route) && array_key_exists('method', $route)) {
             $className = '\\App\\Controllers\\' . $route['controller'];
-            new $className($route['method'], $args, explode('.', $route['middleware']));
+            new $className($route['method'], $args);
         } else {
             throw new Exception('No controllers or callbacks found for this route', 403);
         }
@@ -115,11 +116,11 @@ class Kernel
      */
     private function getRequestType()
     {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $this->method = strtolower(
-            $method === 'GET' ? 'GET' :
-                ($method === 'POST' ? (isset($_POST['_method']) ? $_POST['_method'] : 'POST') :
-                    $method)
+        $type = $_SERVER['REQUEST_METHOD'];
+        $this->type = strtolower(
+            $type === 'GET' ? 'GET' :
+                ($type === 'POST' ? (isset($_POST['_method']) ? $_POST['_method'] : 'POST') :
+                    $type)
         );
     }
 

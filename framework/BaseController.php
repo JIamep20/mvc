@@ -23,14 +23,14 @@ class BaseController
      * @param array $args
      * @param array $middleware
      */
-    public function __construct($method, $args = [], $middleware = [])
+    public function __construct($method, $args = [])
     {
         $this->args = $args;
 
         if(method_exists($this, $method)) {
-            $this->{$method}();
+            $this->{$method}($args);
         } else {
-            throw new \Exception('Method ' .$method . ' in controller ' . static::class . ' does not exist.');
+            throw new \Exception('Method \'' .$method . '\' in controller ' . static::class . ' does not exist.');
         }
     }
 }
