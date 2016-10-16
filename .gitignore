@@ -1,0 +1,4 @@
+/.idea
+/vendor
+/framework/cache
+composer.lock
