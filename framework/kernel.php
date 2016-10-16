@@ -44,15 +44,15 @@ class Kernel
      */
     private function prepareRoute($route)
     {
-        $route['r'] = trim($route['r'], '/');
+        $route['route'] = trim($route['r'], '/');
         $rgp = [];
         $rgp[] = '@^';
-        $rgp[] = preg_replace_callback('@\{' . $this->param_reg_ex . '\}@', function($match) {
+        $rgp[] = preg_replace_callback('@{' . $this->param_reg_ex . '}@', function($match) {
             return $this->param_reg_ex;
-        }, $route['r']);
+        }, $route['route']);
         $rgp[] = '/*$@i';
 
-        $route['r'] = join('', $rgp);
+        $route['route'] = join('', $rgp);
 
         $route['type'] = strtolower($route['type']);
 
@@ -74,9 +74,15 @@ class Kernel
         $args = [];
 
         foreach($this->routes as $route) {
-            if(preg_match($route['r'], $this->uri, $args) && $route['type'] === $this->type){
+            if(preg_match($route['route'], $this->uri, $args) && $route['type'] === $this->type){
                 array_shift($args);
-                $this->processController($route, $args);
+
+                $params_names = null;
+                preg_match_all('@{' . $this->param_reg_ex . '}@', $route['r'], $params_names);
+
+                $params_names = $params_names[1];
+
+                $this->processController($route, array_combine($params_names, $args));
                 return;
             }
         }
