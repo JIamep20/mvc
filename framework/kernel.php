@@ -12,6 +12,7 @@ class Kernel
 {
     protected
         $uri,
+        $get_params,
         $routes = [],
         $type = 'GET',
         $param_reg_ex = '([A-z0-9_-]+)'
@@ -24,6 +25,9 @@ class Kernel
     public function __construct()
     {
         $this->uri = trim(urldecode(preg_replace('/\?.*/iu', '', $_SERVER['REQUEST_URI'])), '/');
+        $this->get_params = $_GET;
+        unset($this->get_params['uri']);
+
         try {
             $this->getRequestType();
             $this->processRoutes();
@@ -106,10 +110,10 @@ class Kernel
         }
 
         if(is_callable($route['method'])) {
-            $route['method']($args);
+            $route['method'](array_merge($args, $this->get_params));
         } elseif (array_key_exists('controller', $route) && array_key_exists('method', $route)) {
             $className = '\\App\\Controllers\\' . $route['controller'];
-            new $className($route['method'], $args);
+            new $className($route['method'], array_merge($args, $this->get_params));
         } else {
             throw new Exception('No controllers or callbacks found for this route', 403);
         }
