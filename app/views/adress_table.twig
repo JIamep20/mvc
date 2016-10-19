@@ -1,0 +1,86 @@
+{% set auth = is_authorized() and admin_page %}
+<form method="get" action="">
+    <table id="#search-table">
+
+        <thead>
+        <tr>
+            <td>Adress book</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Search</td>
+        </tr>
+        <tr>
+            <td>
+                <div class="form-group">
+                    <label for="keywords">Keywords: </label>
+                    <input type="text" name="key" class="form-control" placeholder="" value="{{ key }}">
+                </div>
+                <div class="form-group">
+                    <label for="city">City: </label>
+                    <select name="city">
+                            <option value="">All</option>
+                        {% for item in cities %}
+                            <option value="{{ item.name }}" {% if country == item.name %} selected {% endif %}>{{ item.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country: </label>
+                    <select name="country">
+                        <option value="">All</option>
+                        {% for item in countries %}
+                            <option value="{{ item.name }}" {% if country == item.name %} selected {% endif %}>{{ item.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <input type="submit" class="button button-green" value="Search">
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+</form>
+<div class="form-group">
+    <input type="button" class="button button-red" value="Add new adress">
+</div>
+
+<table id="#adresses-table">
+
+    <thead>
+    <tr>
+        <td>ID</td>
+        <td>Name</td>
+        <td>City</td>
+        <td>Country</td>
+        {% if auth %}
+            <td>Action</td>
+        {% endif %}
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for item in adresses %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.first_name }} {{ item.last_name }}</td>
+            <td>{{ item.city_name }}</td>
+            <td>{{ item.country_name }}</td>
+            {% if auth %}
+                <td>
+                    <a href="#" class="button button-blue">Edit</a>
+                    <a href="#" class="button button-red">Delete</a>
+                </td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+
+</table>

@@ -6,12 +6,12 @@
  * twig caching
  */
 return [
-    'db_server' => 'localhost',
-    'db_name' => 'new_project',
+    'db_host' => 'localhost',
+    'db_name' => 'mydb',
     'db_user' => 'root',
     'db_password' => '123456',
 
-    'debug' => false,
+    'debug' => true,
     'twig' => [
         'cache' => false
     ]

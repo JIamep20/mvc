@@ -25,6 +25,10 @@ class Exception extends BaseException
         parent::__construct($message, $code, $previous);
     }
 
+    /**
+     * Returns respond status code
+     * @return int
+     */
     public function getStatusCode()
     {
         return $this->statusCode;

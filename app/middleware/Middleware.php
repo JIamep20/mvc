@@ -17,5 +17,12 @@ use Framework\BaseMiddleware;
  */
 class Middleware extends BaseMiddleware
 {
-
+    /**
+     * Checks if user is authorized
+     * @return bool
+     */
+    protected function is_authorized()
+    {
+        return array_key_exists('login', $_SESSION);
+    }
 }

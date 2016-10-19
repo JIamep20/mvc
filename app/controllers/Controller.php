@@ -17,5 +17,30 @@ use Framework\BaseController;
  */
 class Controller extends BaseController
 {
-    
+    /**
+     * Checks if user is authorized
+     * @return bool
+     */
+    protected function is_authorized()
+    {
+        return array_key_exists('login', $_SESSION);
+    }
+
+    /**
+     * Adds to the request condition
+     * @param $query
+     * @param $str
+     * @param string $condition
+     * @return string
+     */
+    protected function prepare_condition($query, $str, $condition = 'and')
+    {
+        if(strpos($query, 'where') || strpos($query, 'WHERE')) {
+            $query .= ' ' . $condition . ' ' . $str;
+        } else {
+            $query .= ' where ' . $str;
+        }
+
+        return $query;
+    }
 }

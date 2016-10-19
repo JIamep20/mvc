@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <title>Document</title>
+        <link type="text/css" rel="stylesheet" href="/css/style.css">
+    {% endblock %}
+</head>
+<body>
+
+<div id="page-wrapper">
+    <nav>
+        <ul class="nav clearfix">
+            {% block menu_items %}
+                <li><a href="/">Main page</a></li>
+                {% if is_authorized() %}
+                    <li><a href="/admin">Admin page</a></li>
+                    <li><a href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                {% endif %}
+            {% endblock %}
+        </ul>
+    </nav>
+
+    <div class="content">
+        {% block content %}
+
+        {% endblock %}
+    </div>
+    <footer>
+        {% block footer %}
+            <span>I am footer! :)</span>
+        {% endblock %}
+    </footer>
+</div>
+
+
+</body>
+</html>

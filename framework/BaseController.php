@@ -15,7 +15,6 @@ namespace Framework;
  */
 class BaseController
 {
-    protected $args = []; // This variable contains route params
 
     /**
      * BaseController constructor.
@@ -23,12 +22,11 @@ class BaseController
      * @param array $args
      * @param array $middleware
      */
-    public function __construct($method, $args = [])
+    public function __construct($method, $params = [], $request = [])
     {
-        $this->args = $args;
 
         if(method_exists($this, $method)) {
-            $this->{$method}($args);
+            $this->{$method}($params, $request);
         } else {
             throw new \Exception('Method \'' .$method . '\' in controller ' . static::class . ' does not exist.');
         }

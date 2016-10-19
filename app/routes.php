@@ -7,9 +7,13 @@ use \Framework\Router;
  * Callback function retrieve $args as route params
  */
 
-#TODO numeric params
-Router::get('', function($args) {
-    dump($args);
-});
-Router::get('/1/{page1}/{xcv}/3/{4}', function($args) {dump($args);});
-Router::get('/2/{vote}/{asd2}/3/{zxc4}/2/{vbn5}', function($args) {dump($args);});
+
+Router::get('login', 'AuthController@show_login_form');
+Router::post('login', 'AuthController@login');
+Router::get('logout', 'AuthController@logout');
+
+Router::get('register', 'AuthController@show_register_form');
+Router::post('register', 'AuthController@register');
+
+Router::get('admin', 'AdressBook@adminIndex', 'Auth');
+Router::get('', 'AdressBook@guestIndex');

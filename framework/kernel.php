@@ -12,7 +12,7 @@ class Kernel
 {
     protected
         $uri,
-        $get_params,
+        $params = [],
         $routes = [],
         $type = 'GET',
         $param_reg_ex = '([A-z0-9_-]+)'
@@ -25,18 +25,16 @@ class Kernel
     public function __construct()
     {
         $this->uri = trim(urldecode(preg_replace('/\?.*/iu', '', $_SERVER['REQUEST_URI'])), '/');
-        $this->get_params = $_GET;
-        unset($this->get_params['uri']);
         try {
-            $this->getRequestType();
-            $this->processRoutes();
+            $this->get_request_type();
+            $this->process_routes();
         } catch(Exception $ex) {
             http_response_code($ex->getStatusCode());
-            echo '<h1>' . $ex->getMessage() . '</h1>';
+            render('error', ['code' => $ex->getStatusCode(), 'message' => $ex->getMessage()]);
         }
         catch(\Exception $exx) {
             http_response_code(500);
-            echo '<h1>' . $exx->getMessage() . '</h1>';
+            render('error', ['code' => 500, 'message' => $exx->getMessage()]);
         }
     }
 
@@ -45,7 +43,7 @@ class Kernel
      * @param $route
      * @return mixed
      */
-    private function prepareRoute($route)
+    private function prepare_route($route)
     {
         $route['route'] = trim($route['r'], '/');
         $rgp = [];
@@ -67,11 +65,11 @@ class Kernel
      * depending on request type
      * @throws Exception
      */
-    private function processRoutes()
+    private function process_routes()
     {
         require(BASE_DIR . '/app/routes.php');
         foreach (Router::getRoutes() as $route) {
-            $this->routes[] = $this->prepareRoute($route);
+            $this->routes[] = $this->prepare_route($route);
         }
 
         $args = [];
@@ -90,7 +88,7 @@ class Kernel
                     }
                 }, $params_names);
 
-                $this->processController($route, array_combine($params_names, $args));
+                $this->process_controller($route, $args, $this->params);
                 return;
             }
         }
@@ -104,23 +102,31 @@ class Kernel
      * @param array $args
      * @throws Exception
      */
-    private function processController($route, $args = [])
+    private function process_controller($route, $params = [], $request = [])
     {
         if(array_key_exists('middleware', $route)){
             array_map(function($item){
                 $name = '\\App\\Middleware\\' . $item;
+                if(!class_exists($name)) {
+                    throw new Exception('Middleware ' . $name . ' not found');
+                }
                 new $name;
             }, explode('.', $route['middleware']));
         }
 
-        $data = $this->make_object_from_array($args);
-        $data->gets = $this->make_object_from_array($this->get_params);
+        $params = $this->make_object_from_array($params);
+        $request = $this->make_object_from_array($request);
 
         if(is_callable($route['method'])) {
-            $route['method']($data);
+            $route['method']($params, $request);
         } elseif (array_key_exists('controller', $route) && array_key_exists('method', $route)) {
             $className = '\\App\\Controllers\\' . $route['controller'];
-            new $className($route['method'], $data);
+
+            if(!class_exists($className)) {
+                throw new Exception('Controller ' . $className . ' not found');
+            }
+
+            new $className($route['method'], $params, $request);
         } else {
             throw new Exception('No controllers or callbacks found for this route', 403);
         }
@@ -132,7 +138,7 @@ class Kernel
      * sended from browser request needs custom 
      * type(update, put, patch, delete etc)
      */
-    private function getRequestType()
+    private function get_request_type()
     {
         $type = $_SERVER['REQUEST_METHOD'];
         $this->type = strtolower(
@@ -140,6 +146,15 @@ class Kernel
                 ($type === 'POST' ? (isset($_POST['_method']) ? $_POST['_method'] : 'POST') :
                     $type)
         );
+
+        if ($this->type === 'get') {
+            $this->params = $_REQUEST;
+        } else {
+            parse_str(file_get_contents('php://input'), $this->params);
+        }
+
+        unset($this->params['_method']);
+        unset($this->params['uri']);
     }
 
     /**
