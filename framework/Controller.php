@@ -16,6 +16,8 @@ namespace Framework;
 class BaseController
 {
 
+    protected $pdo;
+    
     /**
      * BaseController constructor.
      * @param $method
@@ -24,7 +26,7 @@ class BaseController
      */
     public function __construct($method, $params = [], $request = [])
     {
-
+        $this->pdo = DB::instance();
         if(method_exists($this, $method)) {
             $this->{$method}($params, $request);
         } else {

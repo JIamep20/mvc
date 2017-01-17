@@ -3,19 +3,17 @@
  * Created by PhpStorm.
  * User: admin
  * Date: 16.10.2016
- * Time: 15:56
+ * Time: 15:51
  */
 
-namespace App\Exceptions;
+namespace Framework;
 
-
-use Framework\BaseException;
 
 /**
- * Class Exception
- * @package App\Exceptions
+ * Class BaseException
+ * @package Framework
  */
-class Exception extends BaseException
+class BaseException extends \Exception
 {
     protected $statusCode;
 
