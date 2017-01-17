@@ -13,7 +13,7 @@ namespace Framework;
  * Class BaseException
  * @package Framework
  */
-class BaseException extends \Exception
+class Exception extends \Exception
 {
     protected $statusCode;
 

@@ -2,8 +2,6 @@
 
 namespace Framework;
 
-use App\Exceptions\Exception;
-
 /**
  * Class Kernel
  * @package Framework
@@ -63,7 +61,7 @@ class Kernel
     /**
      * Method looks for matches in routes and uri
      * depending on request type
-     * @throws Exception
+     * @throws Exception\
      */
     private function process_routes()
     {
@@ -82,25 +80,25 @@ class Kernel
                 preg_match_all('@{' . $this->param_reg_ex . '}@', $route['r'], $params_names);
 
                 $params_names = $params_names[1];
+
                 array_map(function($item) use ($route){
                     if(preg_match('/^\d/', $item) === 1) {
                         throw new Exception('Route parameter can not start with number: ' . $route['r'] , 500);
                     }
                 }, $params_names);
-
                 $this->process_controller($route, $args, $this->params);
                 return;
             }
         }
 
-        throw new Exception('Method not allowed', 404);
+        throw new \Framework\Exception('Method not allowed', 404);
     }
 
     /**
      * Method starts middlewares, callback or Controller->method as described in routes.php
      * @param $route
      * @param array $args
-     * @throws Exception
+     * @throws Exception\
      */
     private function process_controller($route, $params = [], $request = [])
     {
@@ -118,7 +116,10 @@ class Kernel
         $request = $this->make_object_from_array($request);
 
         if(is_callable($route['method'])) {
-            $route['method']($params, $request);
+
+            if($res = $route['method']($params, $request))
+                echo '<pre style="word-wrap: break-word; white-space: pre-wrap;">' . json_encode($res) . '</pre>';
+
         } elseif (array_key_exists('controller', $route) && array_key_exists('method', $route)) {
             $className = '\\App\\Controllers\\' . $route['controller'];
 
@@ -128,7 +129,7 @@ class Kernel
 
             new $className($route['method'], $params, $request);
         } else {
-            throw new Exception('No controllers or callbacks found for this route', 403);
+            throw new \Framework\Exception('No controllers or callbacks found for this route', 403);
         }
     }
 

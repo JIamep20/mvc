@@ -13,7 +13,7 @@ namespace Framework;
  * Base class for App controllers
  * @package Framework
  */
-class BaseController
+abstract class Controller
 {
 
     protected $pdo;
@@ -26,9 +26,10 @@ class BaseController
      */
     public function __construct($method, $params = [], $request = [])
     {
-        $this->pdo = DB::instance();
         if(method_exists($this, $method)) {
-            $this->{$method}($params, $request);
+            if($res = $this->{$method}($params, $request)){
+                echo '<pre style="word-wrap: break-word; white-space: pre-wrap;">' . json_encode($res) . '</pre>';
+            }
         } else {
             throw new \Exception('Method \'' .$method . '\' in controller ' . static::class . ' does not exist.');
         }

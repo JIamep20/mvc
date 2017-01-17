@@ -13,49 +13,55 @@ use App\Exceptions\Exception;
 
 class DB
 {
-    protected static $conn = false;
+    protected $pdo = null;
+    protected static $instance = null;
 
-    /**
-     * Makes query to DB
-     * @param $query
-     * @return mixed
-     * @throws Exception
-     */
-    public static function query($query)
+
+    public function __construct()
     {
-        if(!self::$conn) {
-            self::connect();
-        }
-
-        $data = self::$conn->query($query);
-        
-        if(!$data) {
-            throw new Exception(self::$conn->error, 500);
-        }
-
-        return $data;
+        $dsn = "mysql:host=" . SETTINGS['db_host'] . ";dbname=" . SETTINGS['db_name'] . ";charset=utf8";
+        $opt = array(
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
+        );
+        $this->pdo = new \PDO($dsn, SETTINGS['db_user'], SETTINGS['db_password'], $opt);
     }
 
-    /**
-     * Returns connection error
-     * @return mixed
-     */
-    public static function getError(){
-        return self::$conn->error;
+    public static function instance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self;
+        }
+
+        return self::$instance;
     }
 
-    /**
-     * Trying to connect to DB
-     * @throws Exception
-     */
-    protected static function connect()
+    public function query($query)
     {
-        self::$conn = new \mysqli(SETTINGS['db_host'], SETTINGS['db_user'], SETTINGS['db_password'], SETTINGS['db_name']);
+        $s = $this->pdo->prepare($query);
+        $res = $s->execute();
 
-        if(self::$conn->connect_error)
-        {
-            header("Content-Type: text/html; charset=ISO-1251");
-            throw new Exception('Connection to DataBase failed' . (SETTINGS['debug'] ? ': ' . self::$conn->connect_error : '.'), 500);
+        if ($res !== false) {
+            return $s->fetchAll();
         }
+
+        return [];
+    }
+
+    public function execute($query)
+    {
+        $s = $this->pdo->prepare($query);
+
+        return $s->execute();
+    }
+
+    public function getError()
+    {
+        return $this->pdo->errorInfo();
+    }
+
+    protected function r($statement)
+    {
+        dump($statement->queryString);
     }
 }

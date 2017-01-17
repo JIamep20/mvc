@@ -13,7 +13,7 @@ namespace Framework;
  * Class BaseMiddleware
  * @package Framework
  */
-class BaseMiddleware
+abstract class Middleware
 {
 
 }

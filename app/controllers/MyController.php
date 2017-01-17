@@ -7,15 +7,14 @@
  */
 
 namespace App\Controllers;
+use Framework\Controller;
 
-
-use Framework\BaseController;
 
 /**
  * Class Controller
  * @package App\Controllers
  */
-class Controller extends BaseController
+class MyController extends Controller
 {
     /**
      * Checks if user is authorized

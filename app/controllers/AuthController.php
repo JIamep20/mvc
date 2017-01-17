@@ -9,10 +9,10 @@
 namespace App\Controllers;
 
 
-use App\Exceptions\Exception;
+use Framework\Exception;
 use Framework\DB;
 
-class AuthController extends Controller
+class AuthController extends MyController
 {
     /**
      * Shows login form on '/login'(get) route

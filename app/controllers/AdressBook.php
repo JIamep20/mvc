@@ -9,6 +9,8 @@
 namespace App\Controllers;
 
 
+use App\Models\City;
+use Framework\Controller;
 use Framework\DB;
 
 class AdressBook extends Controller
@@ -40,15 +42,15 @@ class AdressBook extends Controller
      */
     public function guestIndex($p, $r)
     {
-
-        return render('index', [
-            'adresses' => assoc_array($this->prepare_search_query($p, $r)),
+        echo City::all();
+            /*render('index', [
+            'adresses' => $this->prepare_search_query($p, $r),
             'key' => $r->key,
             'city' => $r->city,
             'country' => $r->country,
-            'cities' => assoc_array(DB::query("select name from city order by city.name")),
-            'countries' => assoc_array(DB::query("select name from country order by country.name"))
-        ]);
+            'cities' => $this->pdo->query("select name from city order by city.name"),
+            'countries' => $this->pdo->query("select name from country order by country.name")
+        ]);*/
     }
 
     /**
@@ -80,7 +82,7 @@ FROM adress
         }
 
 
-        $result = DB::query($query);
+        $result = $this->pdo->query($query);
 
         return $result;
     }

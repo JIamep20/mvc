@@ -9,7 +9,9 @@
 namespace App\Models;
 
 
-class City
-{
+use Framework\Model;
 
+class City extends Model
+{
+    protected $table = 'city';
 }

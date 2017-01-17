@@ -9,7 +9,8 @@
 namespace App\Middleware;
 
 
-use App\Exceptions\Exception;
+use Framework\Exception;
+use Framework\Middleware;
 
 class Auth extends Middleware
 {
